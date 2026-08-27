@@ -212,6 +212,7 @@ net_config="virtio,bridge=$BRIDGE,mtu=$MTU"
 
 qm create "$VMID" \
     --name "$VM_NAME" \
+    --tags hermes-unsafe-vm \
     --ostype l26 \
     --machine "$MACHINE" \
     --bios "$BIOS" \
