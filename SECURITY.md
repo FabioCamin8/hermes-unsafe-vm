@@ -23,6 +23,12 @@ or model interaction can use root inside the guest.
 - The reusable browser profile is absent or freshly created and unauthenticated.
 - Public configuration contains placeholders only; active `.env` files are
   ignored and never copied by Cloud-Init examples.
+- Template conversion captures source identity privately, removes guest
+  credentials/runtime/browser state, clears inherited Cloud-Init keys, and
+  requires the exact tagged VM to be stopped before conversion.
+- Cloning supplies a fresh Cloud-Init public key and validates identity and
+  runtime separation before onboarding. Source identity evidence and operator
+  addresses remain outside Git and public evidence.
 
 The `hermes` account remains intentionally root-capable inside the VM. Do not
 describe this as least privilege or as a security control.

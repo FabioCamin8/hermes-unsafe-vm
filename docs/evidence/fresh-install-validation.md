@@ -1,6 +1,6 @@
 # Fresh install validation evidence
 
-Status: ACCEPTED WITH EXTERNAL INFERENCE BLOCKER
+Status: ACCEPTED WITH MODEL-CAPACITY NOTE
 Date: 2026-08-27
 
 ## Baseline
@@ -34,13 +34,19 @@ Date: 2026-08-27
 - Synthetic direct-memory record: PASS for upsert, FTS search, checkpoint
   journal search, soft-forget, and post-cleanup integrity; no active marker
   remained.
+- Fresh-VM cross-session recall A/B: PASS with a temporary per-run model
+  override to `minimax/minimax-m3:free`. Session A and B exited successfully,
+  the automatic-recall indicator appeared, the exact synthetic value matched,
+  cleanup/soft-forget passed, active search was empty, and SQLite integrity
+  passed. The configured default model was unchanged.
 
 ## External boundary
 
-Automatic cross-session model recall: `BLOCKED_AUTH` / no inference provider
-configured. Hermes reported this boundary without creating the synthetic
-record. No model was selected, no credential was added, and no OAuth flow was
-started.
+The default configured model was not independently probed in this run because
+the provider allowed only a small remaining budget while that model reserved
+128K tokens. The A/B proof therefore uses only the temporary per-run model
+override above; it does not claim that the default model is currently usable.
+No credential was added or persisted, and no OAuth flow was started.
 
 ## Defects fixed during acceptance
 

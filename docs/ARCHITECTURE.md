@@ -20,3 +20,23 @@ duplicate the implementation.
 
 The gateway remains a user systemd service. The `hermes` user is nevertheless
 fully root-capable through the explicit unsafe sudo rule.
+
+## Template lifecycle
+
+```text
+validated disposable VM
+        │
+        ├── guest sanitize + validate
+        ├── capture source identity privately
+        ├── clear Cloud-Init source credentials
+        └── Proxmox template
+                    │
+                    ├── full clone + fresh Cloud-Init SSH key
+                    ├── DHCP first boot regenerates identity/host keys
+                    └── host identity + guest runtime/data validation
+```
+
+The guest scripts own state deletion and runtime invariants. The Proxmox
+scripts own exact VM identity, stopped/template state, Cloud-Init inputs, and
+cross-boot identity comparison. No provider credential, browser session, or
+source identity value crosses into the public repository.

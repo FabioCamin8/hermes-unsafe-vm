@@ -48,6 +48,23 @@ official Debian image checksum, refuses an occupied VMID, parameterizes storage,
 bridge, CPU, memory, disk, VLAN, and SSH key, and can only create with the
 explicit `--apply` mode. See [docs/PROXMOX.md](docs/PROXMOX.md).
 
+For a project-created disposable VM, the separate template lifecycle is:
+
+```bash
+./proxmox/convert-template.sh --apply /path/to/private-template.env
+./proxmox/clone-template.sh --apply /path/to/private-clone.env
+./proxmox/validate-clone.sh --verify /path/to/private-clone.env
+```
+
+Conversion captures source identity in a private evidence file, sanitizes and
+validates the guest, removes inherited Cloud-Init credentials, and marks the
+exact tagged VM as a Proxmox template. Cloning supplies a new Cloud-Init SSH
+key and DHCP configuration. Discover the clone address through QEMU Guest
+Agent, put that private address in the clone env file, and run the clone gate.
+These scripts refuse unmarked or already-converted guests and never touch the
+protected host or unrelated VMIDs. See [docs/TEMPLATE.md](docs/TEMPLATE.md),
+[docs/CLONING.md](docs/CLONING.md), and the [sanitized evidence](docs/evidence/template-clone-validation.md).
+
 ## Other modes
 
 `--mode existing` performs a read-only inventory first and refuses to converge
@@ -73,5 +90,10 @@ validated against the pinned Chrome DevTools MCP release, not claimed as its
 official browser target. Run both `scripts/validate-public-tree.sh` and
 `scripts/validate-public-history.sh` before publication. See
 [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
+
+Initial v0.1.x Git metadata was canonicalized shortly after publication to
+replace machine-generated author and tag identities with the project's GitHub
+noreply identity. Source functionality and release intent were preserved; the
+correction was a one-time initial-publication cleanup.
 
 License: pending. No license has been selected for this experimental project.

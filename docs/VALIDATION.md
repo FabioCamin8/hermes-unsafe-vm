@@ -18,3 +18,20 @@ Acceptance gates for fresh mode are:
 
 The test suite is repository-level proof only. It never substitutes for the
 fresh disposable VM, reboot, or graphical CUA gates.
+
+## Template and clone gates
+
+The template/clone path has its own acceptance matrix:
+
+| Gate | Required proof |
+| --- | --- |
+| Guest sanitation | managed marker, empty machine-id, removed SSH host keys, clean runtime/browser/auth state, preserved unsafe sudo |
+| Template conversion | exact VM identity rechecked, stopped state, source Cloud-Init key/password absent, `template: 1` |
+| Clone creation | unused VMID, full clone, fresh Cloud-Init public key, DHCP, non-template state |
+| Clone identity | new machine-id, hostname, and SSH host-key fingerprint set compared with private source evidence |
+| Clone runtime | Cloud-Init complete, Hermes health, gateway/CDP/MCP/CUA checks, clean browser, absent credentials |
+| Clone data | validation vault/session search empty and Vault/SQLite integrity healthy |
+
+Run the host wrappers from the Proxmox node and the guest validators through
+the wrappers. A `PASS` in a source-tree contract test does not prove a live
+template or clone.

@@ -7,6 +7,65 @@ scan_dir=$(mktemp -d)
 trap 'rm -rf -- "${scan_dir:-}"' EXIT
 status=0
 
+allowed_name='FabioCamin8'
+allowed_email='278987681+FabioCamin8@users.noreply.github.com'
+commit_count=0
+unexpected_author_count=0
+unexpected_committer_count=0
+unexpected_tagger_count=0
+root_occurrences=0
+domain_occurrences=0
+
+for commit in $(git rev-list --all); do
+  metadata=$(git show -s --format='%an%x09%ae%x09%cn%x09%ce' "$commit")
+  IFS=$'\t' read -r author_name author_email committer_name committer_email <<<"$metadata"
+  commit_count=$((commit_count + 1))
+
+  if [[ $author_name != "$allowed_name" || $author_email != "$allowed_email" ]]; then
+    unexpected_author_count=$((unexpected_author_count + 1))
+    printf 'HISTORY_UNEXPECTED_AUTHOR commit=%s\n' "$commit" >&2
+    status=1
+  fi
+  if [[ $committer_name != "$allowed_name" || $committer_email != "$allowed_email" ]]; then
+    unexpected_committer_count=$((unexpected_committer_count + 1))
+    printf 'HISTORY_UNEXPECTED_COMMITTER commit=%s\n' "$commit" >&2
+    status=1
+  fi
+  for field in "$author_name" "$author_email" "$committer_name" "$committer_email"; do
+    case "$field" in
+      *root*) root_occurrences=$((root_occurrences + 1)) ;;
+      *agent.caminotto.it*) domain_occurrences=$((domain_occurrences + 1)) ;;
+    esac
+  done
+done
+
+tag_count=0
+while IFS=$'\t' read -r ref object_type tagger_name tagger_email; do
+  tag_count=$((tag_count + 1))
+  tagger_email=${tagger_email#<}
+  tagger_email=${tagger_email%>}
+  if [[ $object_type != tag ]]; then
+    unexpected_tagger_count=$((unexpected_tagger_count + 1))
+    printf 'HISTORY_TAG_NOT_ANNOTATED ref=%s\n' "$ref" >&2
+    status=1
+    continue
+  fi
+  if [[ $tagger_name != "$allowed_name" || $tagger_email != "$allowed_email" ]]; then
+    unexpected_tagger_count=$((unexpected_tagger_count + 1))
+    printf 'HISTORY_UNEXPECTED_TAGGER ref=%s\n' "$ref" >&2
+    status=1
+  fi
+  for field in "$tagger_name" "$tagger_email"; do
+    case "$field" in
+      *root*) root_occurrences=$((root_occurrences + 1)) ;;
+      *agent.caminotto.it*) domain_occurrences=$((domain_occurrences + 1)) ;;
+    esac
+  done
+done < <(git for-each-ref refs/tags --format='%(refname)%09%(objecttype)%09%(taggername)%09%(taggeremail)')
+
+printf 'IDENTITY_SCAN commits=%s tags=%s unexpected_authors=%s unexpected_committers=%s unexpected_taggers=%s root_occurrences=%s agent_caminotto_occurrences=%s\n' \
+  "$commit_count" "$tag_count" "$unexpected_author_count" "$unexpected_committer_count" "$unexpected_tagger_count" "$root_occurrences" "$domain_occurrences"
+
 for commit in $(git rev-list --all); do
   while IFS= read -r path; do
     case "$path" in

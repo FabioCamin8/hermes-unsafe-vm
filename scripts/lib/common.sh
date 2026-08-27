@@ -49,3 +49,22 @@ write_atomic() {
   rm -f -- "$temporary"
   trap - RETURN
 }
+
+scan_user_state_for_obvious_credentials() {
+  local home=$1
+  local pattern='-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----|\b(sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|xox[baprs]-[A-Za-z0-9-]{16,}|AIza[A-Za-z0-9_-]{24,})\b'
+  [[ -d $home ]] || return 2
+  (
+    cd "$home" || exit 2
+    rg -l --hidden \
+      --glob '!.hermes/hermes-agent/**' \
+      --glob '!.hermes/node/**' \
+      --glob '!.hermes/skills/**' \
+      --glob '!.local/share/hermes-autonomy/**' \
+      --glob '!.local/share/uv/**' \
+      --glob '!.local/share/hermes-unsafe-vm/chromium-profile/WasmTtsEngine/**' \
+      --glob '!*.pyc' --glob '!*.log' \
+      --regexp "$pattern" \
+      .hermes .config .local/share .ssh >/dev/null 2>&1
+  )
+}
