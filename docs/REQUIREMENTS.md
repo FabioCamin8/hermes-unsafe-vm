@@ -13,6 +13,10 @@
 | Codex CLI | `@openai/codex` `0.150.1`, never `@latest` |
 | autonomy | `v0.1.0` at `3faa738f1699d24f9d9e8d767b1844d945235521` |
 
+The tested image baseline is `debian-13-genericcloud-amd64-20260826-2582.qcow2`
+from the matching dated Debian cloud-image directory. Update the date and
+review its SHA-512 manifest deliberately when refreshing the image.
+
 ## Primary sources
 
 - Hermes installer: https://hermes-agent.nousresearch.com/install.sh

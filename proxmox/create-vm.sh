@@ -37,8 +37,8 @@ require_account_name() {
 
 require_https_debian_image() {
     local value=$1
-    [[ "$value" =~ ^https://cloud\.debian\.org/images/cloud/[^/]+/[^/]+/debian-[0-9]+-genericcloud-amd64\.qcow2$ ]] \
-        || die 'IMAGE_URL must be an official Debian cloud.debian.org genericcloud amd64 qcow2 URL'
+    [[ "$value" =~ ^https://cloud\.debian\.org/images/cloud/trixie/[0-9]{8}-[0-9]{4}/debian-13-genericcloud-amd64-[0-9]{8}-[0-9]{4}\.qcow2$ ]] \
+        || die 'IMAGE_URL must be an official dated Debian 13 Trixie genericcloud amd64 qcow2 URL'
 }
 
 require_https_debian_checksum() {
