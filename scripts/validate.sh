@@ -17,8 +17,9 @@ runtime_dir=/run/user/$uid
 [[ $(uname -m) == x86_64 ]] || die 'architecture gate failed'
 [[ $(stat -c %U "$home") == "$HERMES_USER" && $(stat -c %a "$home") == 700 ]] || die 'Hermes home ownership/mode gate failed'
 runuser -u "$HERMES_USER" -- sudo -n id -u | grep -qx 0 || die 'unsafe sudo gate failed'
-sshd -T | grep -Eiq '^passwordauthentication no$' || die 'password SSH is enabled'
-sshd -T | grep -Eiq '^permitrootlogin no$' || die 'remote root SSH is enabled'
+ssh_effective=$(sshd -T)
+grep -Eiq '^passwordauthentication no$' <<<"$ssh_effective" || die 'password SSH is enabled'
+grep -Eiq '^permitrootlogin no$' <<<"$ssh_effective" || die 'remote root SSH is enabled'
 systemctl is-active --quiet qemu-guest-agent || die 'QEMU guest agent is not active'
 systemctl is-active --quiet lightdm || die 'LightDM is not active'
 systemctl is-active --quiet nftables || die 'nftables is not active'

@@ -10,6 +10,9 @@ HERMES_USER=${HERMES_USER:-hermes}
 HERMES_CDP_PORT=${HERMES_CDP_PORT:-9222}
 require_integer_range HERMES_CDP_PORT "$HERMES_CDP_PORT" 1 65535
 home=$(hermes_home_for_user "$HERMES_USER")
+install -d -o "$HERMES_USER" -g "$HERMES_USER" -m 0755 \
+  "$home/.local" "$home/.local/bin" "$home/.local/share"
+install -d -o "$HERMES_USER" -g "$HERMES_USER" -m 0755 "$home/.config"
 profile_dir="$home/.local/share/hermes-unsafe-vm/chromium-profile"
 install -d -o "$HERMES_USER" -g "$HERMES_USER" -m 0700 "$profile_dir" "$home/.config/hermes-unsafe-vm"
 install -o "$HERMES_USER" -g "$HERMES_USER" -m 0700 "$script_dir/hermes-session-start.sh" "$home/.local/bin/hermes-unsafe-vm-session-start"

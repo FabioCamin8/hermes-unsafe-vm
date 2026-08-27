@@ -11,7 +11,7 @@
 | Node/npm | Debian packages unless Hermes supplies a newer managed runtime |
 | Chrome DevTools MCP | `1.8.0`, never `@latest` |
 | Codex CLI | `@openai/codex` `0.150.1`, never `@latest` |
-| autonomy | `v0.1.0` at `3faa738f1699d24f9d9e8d767b1844d945235521` |
+| autonomy | `v0.1.2` at `d85bed5126376af913c3ca3e607396bee5493461` |
 
 The tested image baseline is `debian-13-genericcloud-amd64-20260826-2582.qcow2`
 from the matching dated Debian cloud-image directory. Update the date and

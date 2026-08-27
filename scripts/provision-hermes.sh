@@ -40,9 +40,12 @@ if [[ -n $HERMES_COMMIT && $source_commit != "$HERMES_COMMIT" ]]; then
 fi
 hermes_version=$(runuser -u "$HERMES_USER" -- env HOME="$home" PATH="$home/.local/bin:/usr/local/bin:/usr/bin:/bin" "$hermes_bin" --version | head -n 1)
 uid=$(id -u "$HERMES_USER")
+runtime_dir="/run/user/$uid"
 loginctl enable-linger "$HERMES_USER" >/dev/null 2>&1 || true
 systemctl start "user@$uid.service" >/dev/null 2>&1 || true
-runtime_dir="/run/user/$uid"
+if [[ ! -S "$runtime_dir/bus" ]]; then
+  systemctl restart "user@$uid.service" >/dev/null 2>&1 || true
+fi
 for _ in {1..30}; do
   [[ -S "$runtime_dir/bus" ]] && break
   sleep 1

@@ -21,6 +21,14 @@ require_integer_range HERMES_CDP_PORT "$HERMES_CDP_PORT" 1 65535
 home=$(hermes_home_for_user "$HERMES_USER")
 target_root=/usr/local/share/hermes-unsafe-vm
 target="$target_root/autonomy-$HERMES_AUTONOMY_VERSION"
+
+normalize_checkout_permissions() {
+  local checkout=$1
+  find "$checkout" -type d -exec chmod 0755 {} +
+  find "$checkout" -type f ! -perm /111 -exec chmod 0644 {} +
+  find "$checkout" -type f -perm /111 -exec chmod 0755 {} +
+}
+
 if [[ -d "$target/.git" ]]; then
   resolved=$(git -C "$target" rev-parse HEAD)
   [[ $resolved == "$HERMES_AUTONOMY_COMMIT" ]] || die "existing autonomy checkout is $resolved, expected $HERMES_AUTONOMY_COMMIT"
@@ -35,6 +43,7 @@ else
   rm -rf -- "$stage"
   trap - EXIT
 fi
+normalize_checkout_permissions "$target"
 resolved=$(git -C "$target" rev-parse HEAD)
 HERMES_HOME="$home/.hermes" HERMES_BIN="$home/.local/bin/hermes" HERMES_CDP_PORT="$HERMES_CDP_PORT" "$target/bootstrap.sh" --enable-unsafe-root
 install -d -m 0755 /etc/hermes-unsafe-vm
