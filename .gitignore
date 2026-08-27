@@ -1,0 +1,35 @@
+# Local deployment configuration and credentials.
+*.local.env
+config/local.env
+proxmox/local.env
+*.pem
+*.key
+*.pub
+id_*
+*.token
+*.secret
+*.credentials
+*.cookie
+auth.json
+.env
+.env.*
+!.env.example
+
+# Runtime state and evidence.
+*.db
+*.db-wal
+*.db-shm
+*.sqlite*
+vault/
+backups/
+sessions/
+browser-profile/
+chromium-profile/
+logs/
+*.log
+docs/evidence/private-*
+
+# Tool output.
+.pytest_cache/
+__pycache__/
+*.py[cod]

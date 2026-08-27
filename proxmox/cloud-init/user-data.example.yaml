@@ -1,0 +1,13 @@
+#cloud-config
+# Template only. Do not commit rendered keys or deployment-specific values.
+hostname: ${VM_NAME}
+manage_etc_hosts: true
+fqdn: ${VM_NAME}
+package_upgrade: false
+
+users:
+  - name: ${CI_USER}
+    shell: /bin/bash
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${SSH_PUBLIC_KEY}
