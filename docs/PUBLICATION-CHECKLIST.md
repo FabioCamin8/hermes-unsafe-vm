@@ -4,6 +4,8 @@
 - [ ] No active `.env`, key, token, cookie, browser profile, vault, database,
   session, log, backup, or private URL is tracked.
 - [ ] `scripts/validate-public-tree.sh` passes on the current tree.
+- [ ] `scripts/validate-public-history.sh` reports `HISTORY_SCAN=PASS`, including
+  the generated `git archive` path scan.
 - [ ] Git history intended for publication is a clean sanitized root.
 - [ ] README leads with the unsafe-by-design warning.
 - [ ] Autonomy dependency has a release tag and expected full commit.

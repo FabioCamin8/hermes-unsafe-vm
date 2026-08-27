@@ -41,34 +41,20 @@ autonomy_commit=${HERMES_AUTONOMY_COMMIT:-unknown}
 hermes_version=$(runuser -u "$HERMES_USER" -- env HOME="$home" PATH="$home/.local/bin:$home/.hermes/node/bin:/usr/local/bin:/usr/bin:/bin" "$home/.local/bin/hermes" --version | head -n 1)
 chromium_version=$(/usr/bin/chromium --version 2>/dev/null || true)
 node_version=$(node --version)
-python3 - "$autonomy_version" "$autonomy_commit" "$hermes_version" "$chromium_version" "$node_version" "$HERMES_CDP_PORT" <<'PY'
-import json
-import os
-import platform
-import sys
-from datetime import datetime, timezone
-
-version, commit, hermes, chromium, node, port = sys.argv[1:]
-payload = {
-    "schema": 1,
-    "builder_version": "0.1.0",
-    "debian_version": platform.release(),
-    "hermes_version": hermes,
-    "autonomy_version": version,
-    "autonomy_commit": commit,
-    "chrome_devtools_mcp_version": os.environ.get("CHROME_DEVTOOLS_MCP_VERSION", "unknown"),
-    "chromium_version": chromium,
-    "cua_version": "installed-by-hermes",
-    "codex_version": os.environ.get("CODEX_VERSION", "unknown"),
-    "node_version": node,
-    "cdp": f"127.0.0.1:{port}",
-    "provisioned_at": datetime.now(timezone.utc).isoformat(),
-    "unsafe_root_enabled": True,
-}
-with open("/etc/hermes-unsafe-vm/manifest.json", "w", encoding="utf-8") as handle:
-    json.dump(payload, handle, indent=2, sort_keys=True)
-    handle.write("\n")
-os.chmod("/etc/hermes-unsafe-vm/manifest.json", 0o644)
-PY
+cua_version=$(runuser -u "$HERMES_USER" -- env HOME="$home" PATH="$home/.local/bin:$home/.hermes/node/bin:/usr/local/bin:/usr/bin:/bin" "$home/.local/bin/cua-driver" --version 2>/dev/null | awk 'NR == 1 { print $2 }' || true)
+[[ -n $cua_version ]] || die 'unable to resolve the installed CUA version'
+python3 "$script_dir/write-manifest.py" \
+  --output /etc/hermes-unsafe-vm/manifest.json \
+  --builder-version 0.1.1 \
+  --autonomy-version "$autonomy_version" \
+  --autonomy-commit "$autonomy_commit" \
+  --hermes-version "$hermes_version" \
+  --chromium-version "$chromium_version" \
+  --node-version "$node_version" \
+  --chrome-devtools-mcp-version "${CHROME_DEVTOOLS_MCP_VERSION:-unknown}" \
+  --cua-version "$cua_version" \
+  --codex-version "${CODEX_VERSION:-unknown}" \
+  --cdp-port "$HERMES_CDP_PORT" \
+  --unsafe-root-enabled
 "$script_dir/validate.sh"
 printf '%s\n' 'BOOTSTRAP=PASS' 'MANIFEST=/etc/hermes-unsafe-vm/manifest.json'

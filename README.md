@@ -70,6 +70,8 @@ The acceptance contract is in [docs/VALIDATION.md](docs/VALIDATION.md). A
 successful protocol initialization does not mean Codex is authenticated;
 specialist execution may remain `BLOCKED_AUTH`. Debian Chromium is empirically
 validated against the pinned Chrome DevTools MCP release, not claimed as its
-official browser target. See [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
+official browser target. Run both `scripts/validate-public-tree.sh` and
+`scripts/validate-public-history.sh` before publication. See
+[docs/LIMITATIONS.md](docs/LIMITATIONS.md).
 
 License: pending. No license has been selected for this experimental project.
