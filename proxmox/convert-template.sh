@@ -101,6 +101,7 @@ fi
 wait_for_stopped "$TEMPLATE_VMID"
 
 assert_project_vm "$TEMPLATE_VMID" "$TEMPLATE_NAME"
+assert_pve_tablet_device "$TEMPLATE_VMID"
 qm set "$TEMPLATE_VMID" --delete sshkeys >/dev/null 2>&1 || true
 if grep -Fxq 'cipassword:' <<<"$(vm_config "$TEMPLATE_VMID")"; then
   qm set "$TEMPLATE_VMID" --delete cipassword >/dev/null

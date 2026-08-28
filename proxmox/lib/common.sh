@@ -33,6 +33,15 @@ require_pve_tools() {
   done
 }
 
+assert_pve_tablet_device() {
+  local vmid=$1 config showcmd
+  config=$(qm config "$vmid") || die "VMID $vmid does not exist"
+  grep -Fxq 'tablet: 1' <<<"$config" || die "VMID $vmid does not enable the Proxmox tablet"
+  showcmd=$(qm showcmd "$vmid" --pretty) || die "unable to render QEMU command for VMID $vmid"
+  grep -Eq -- "-device ['\"]usb-tablet([,'\"]|$)" <<<"$showcmd" || \
+    die "VMID $vmid does not render a QEMU USB tablet device"
+}
+
 vm_config() {
   qm config "$1"
 }

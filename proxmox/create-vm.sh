@@ -268,6 +268,7 @@ grep -Eq '^vga: virtio$' <<<"$final_config" \
     || die 'final qm config does not use VirtIO graphics'
 grep -Eq '^tablet: 1$' <<<"$final_config" \
     || die 'final qm config does not enable the QEMU tablet'
+assert_pve_tablet_device "$VMID"
 
 start_state=stopped
 if [[ "$START_VM" == 1 ]]; then

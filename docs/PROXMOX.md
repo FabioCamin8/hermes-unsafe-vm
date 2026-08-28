@@ -9,6 +9,11 @@ VirtIO/SCSI disk with discard/SSD/I/O-thread flags where supported, VirtIO NIC,
 Cloud-Init drive, serial console, QEMU Guest Agent enabled, and DHCP. These are
 parameterized defaults, not universal Proxmox requirements.
 
+Graphical/CUA guests must expose a functional virtual pointer. The creation,
+template, and clone paths validate both `tablet: 1` and the generated QEMU
+`usb-tablet` device; validate the guest layers separately because a nominal
+Proxmox tablet flag does not prove kernel, `/dev/input`, X11, or CUA input.
+
 ```bash
 cp proxmox/defaults.env.example /root/hermes-pve.local.env
 # Fill VMID, STORAGE, and SSH_PUBLIC_KEY_FILE.

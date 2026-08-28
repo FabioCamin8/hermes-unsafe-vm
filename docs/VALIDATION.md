@@ -11,6 +11,9 @@ Acceptance gates for fresh mode are:
   disabled, and firewall: PASS;
 - Hermes/gateway as user `hermes`, unsafe passwordless root: PASS;
 - XFCE/X11, Chromium, CDP loopback-only, Chrome MCP, and CUA: PASS;
+- functional pointer input: PVE renders a QEMU USB tablet, the guest
+  enumerates an event-backed pointer, X11 exposes a non-XTEST slave pointer,
+  and the CUA doctor reports X11 input injection plus screen capture;
 - Codex MCP protocol: PASS or explicit `BLOCKED_AUTH` for missing credentials;
 - autonomy vault, SQLite/FTS, recall, session search, and `hermes-health`: PASS;
 - second bootstrap run preserves state and creates no duplicate policy;
@@ -18,6 +21,12 @@ Acceptance gates for fresh mode are:
 
 The test suite is repository-level proof only. It never substitutes for the
 fresh disposable VM, reboot, or graphical CUA gates.
+
+The pointer gate is split at the trust boundary. Run
+`proxmox/validate-input.sh --verify VMID` on the Proxmox node to validate the
+rendered QEMU device, then run `scripts/validate-input.sh` as root in the
+guest (or use `scripts/validate.sh`, which includes it). `tablet: 1` alone is
+not accepted as proof of functional input.
 
 ## Template and clone gates
 

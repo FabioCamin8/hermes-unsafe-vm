@@ -15,7 +15,7 @@ if bash proxmox/create-vm.sh --dry-run >/dev/null 2>&1; then
   printf '%s\n' 'create-vm accepted missing environment file' >&2
   exit 1
 fi
-for lifecycle in proxmox/convert-template.sh proxmox/clone-template.sh proxmox/validate-clone.sh; do
+for lifecycle in proxmox/convert-template.sh proxmox/clone-template.sh proxmox/validate-clone.sh proxmox/validate-input.sh; do
   if bash "$lifecycle" >/dev/null 2>&1; then
     printf '%s\n' "$lifecycle accepted missing arguments" >&2
     exit 1
@@ -30,6 +30,14 @@ grep -q 'find "\$checkout" -type d -exec chmod 0755' scripts/install-autonomy.sh
 grep -q 'find "\$checkout" -type f ! -perm /111 -exec chmod 0644' scripts/install-autonomy.sh
 grep -q 'find "\$checkout" -type f -perm /111 -exec chmod 0755' scripts/install-autonomy.sh
 grep -q 'HERMES_CDP_PORT' scripts/hermes-session-start.sh scripts/validate.sh
+grep -q 'linux-image-amd64' scripts/provision-os.sh
+grep -q 'grub-reboot' scripts/provision-os.sh
+grep -q 'validate-input.sh' scripts/validate.sh scripts/validate-template.sh
+grep -q 'KERNEL_POINTER=PASS' scripts/validate-input.sh
+grep -q 'X11_POINTER=PASS' scripts/validate-input.sh
+grep -q 'CUA_INPUT=PASS' scripts/validate-input.sh
+grep -q 'assert_pve_tablet_device' proxmox/lib/common.sh proxmox/create-vm.sh proxmox/clone-template.sh proxmox/convert-template.sh proxmox/validate-clone.sh proxmox/validate-input.sh
+grep -q 'usb-tablet' proxmox/lib/common.sh
 grep -q 'ssh_effective=\$(sshd -T)' scripts/validate.sh
 grep -q '<<<"\$ssh_effective"' scripts/validate.sh
 grep -q 'install -d -o "$HERMES_USER" -g "$HERMES_USER" -m 0755' scripts/provision-browser.sh

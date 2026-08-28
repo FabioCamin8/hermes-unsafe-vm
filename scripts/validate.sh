@@ -23,6 +23,7 @@ grep -Eiq '^permitrootlogin no$' <<<"$ssh_effective" || die 'remote root SSH is 
 systemctl is-active --quiet qemu-guest-agent || die 'QEMU guest agent is not active'
 systemctl is-active --quiet lightdm || die 'LightDM is not active'
 systemctl is-active --quiet nftables || die 'nftables is not active'
+"$script_dir/validate-input.sh"
 curl -fsS "http://127.0.0.1:$HERMES_CDP_PORT/json/version" >/dev/null || die 'CDP endpoint is unavailable'
 listeners=$(ss -ltnH | awk -v expected="127.0.0.1:$HERMES_CDP_PORT" '$4 == expected { found = 1 } END { exit !found }' && printf PASS || printf FAIL)
 [[ $listeners == PASS ]] || die 'CDP is not loopback-only'

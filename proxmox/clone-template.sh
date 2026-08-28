@@ -51,6 +51,7 @@ config=$(vm_config "$CLONE_VMID")
 grep -Fxq "name: $CLONE_NAME" <<<"$config" || die 'clone name does not match requested value'
 has_project_tag "$(project_tags "$config")" || die 'clone is missing the hermes-unsafe-vm project tag'
 grep -Fxq 'agent: 1' <<<"$config" || die 'clone does not retain QEMU Guest Agent'
+assert_pve_tablet_device "$CLONE_VMID"
 if [[ $START_VM == 1 ]]; then
   qm start "$CLONE_VMID"
   start_state=started

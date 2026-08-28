@@ -18,6 +18,8 @@ by design; it is not a secure autonomous-agent appliance.
 
 - SSH key-only access, remote root login disabled, and a minimal nftables policy;
 - QEMU Guest Agent, XFCE/X11, LightDM, and a fresh Chromium profile;
+- Debian's generic hardware kernel, including the USB/HID and virtual-mouse
+  drivers required by the graphical pointer stack;
 - Chromium CDP bound only to `127.0.0.1`;
 - Hermes Agent, Computer Use, Chrome DevTools MCP, and Codex MCP;
 - the released `hermes-unsafe-autonomy` runtime, installed by immutable tag and
@@ -38,7 +40,11 @@ sudo ./scripts/bootstrap.sh --config /root/hermes-unsafe-vm.local.env
 
 The bootstrap is rerunnable. It installs only the listed guest state, never
 authenticates an account, and never receives Proxmox credentials. Run
-`scripts/validate.sh` after a real reboot as well as after the first pass.
+`scripts/validate.sh` after a real reboot as well as after the first pass. A
+genericcloud image initially boots Debian's cloud kernel; the first bootstrap
+pass installs the generic kernel and schedules it for the next boot, then asks
+for a reboot and rerun. The completed validation checks the guest kernel,
+`/dev/input`, X11, and CUA input layers.
 
 ## Proxmox path
 

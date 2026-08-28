@@ -74,6 +74,7 @@ else
   [[ $scan_rc -eq 1 ]] || die 'template credential-state scan failed'
 fi
 runuser -u "$HERMES_USER" -- sudo -n id -u | grep -qx 0 || die 'unsafe sudo rule was not preserved'
+"$script_dir/validate-input.sh" --kernel-only
 printf '%s\n' \
   'TEMPLATE_VALIDATION=PASS' 'MACHINE_ID=RESET' 'SSH_HOST_KEYS=RESET' \
   'RUNTIME_STATE=CLEAN' 'BROWSER_STATE=ABSENT' 'AUTH_STATE=ABSENT' \

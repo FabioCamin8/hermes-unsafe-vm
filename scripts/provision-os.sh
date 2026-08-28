@@ -17,9 +17,34 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y --no-install-recommends \
   ca-certificates curl dbus-user-session git iproute2 lightdm lightdm-gtk-greeter \
+  linux-image-amd64 \
   nftables openssh-server python3 python3-venv qemu-guest-agent sqlite3 sudo \
   xorg xfce4 dbus-x11 at-spi2-core xfce4-power-manager x11-utils \
   x11-xserver-utils xinput wmctrl chromium nodejs npm
+
+generic_kernel=$(find /boot -maxdepth 1 -type f -name 'vmlinuz-*' \
+  ! -name '*-cloud-amd64' -printf '%f\n' | sed 's/^vmlinuz-//' | sort -V | tail -n 1)
+[[ -n $generic_kernel ]] || die 'Debian generic kernel was not installed'
+
+active_kernel=$(uname -r)
+if [[ $active_kernel == *-cloud-amd64 ]]; then
+  command -v grub-reboot >/dev/null 2>&1 || die 'grub-reboot is required to select the generic kernel'
+  grub-reboot "Advanced options for Debian GNU/Linux>Debian GNU/Linux, with Linux $generic_kernel"
+  printf '%s\n' 'OS_PROVISION=PARTIAL' "GENERIC_KERNEL=$generic_kernel" \
+    'KERNEL_REBOOT_REQUIRED=YES'
+  die 'generic kernel installed; reboot into it and rerun bootstrap.sh'
+fi
+[[ $active_kernel == *+deb13-amd64 ]] || die "active kernel is not Debian generic amd64: $active_kernel"
+
+mapfile -t cloud_kernel_packages < <(
+  dpkg-query -W -f='${db:Status-Status}\t${binary:Package}\n' \
+    'linux-image-cloud-amd64' 'linux-image-*-cloud-amd64' 2>/dev/null |
+    awk '$1 == "installed" { print $2 }' | sort -u
+)
+if ((${#cloud_kernel_packages[@]})); then
+  apt-get purge -y "${cloud_kernel_packages[@]}"
+fi
+update-grub >/dev/null
 
 if ! getent passwd "$HERMES_USER" >/dev/null; then
   useradd --create-home --user-group --shell /bin/bash "$HERMES_USER"

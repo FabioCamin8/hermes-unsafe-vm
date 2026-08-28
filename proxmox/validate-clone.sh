@@ -31,6 +31,7 @@ config=$(vm_config "$CLONE_VMID") || die "clone VMID $CLONE_VMID does not exist"
 grep -Fxq "name: $CLONE_NAME" <<<"$config" || die 'clone name mismatch'
 has_project_tag "$(project_tags "$config")" || die 'clone is missing the hermes-unsafe-vm tag'
 ! grep -Fxq 'template: 1' <<<"$config" || die 'clone must not be a template'
+assert_pve_tablet_device "$CLONE_VMID"
 [[ $(vm_status "$CLONE_VMID") == running ]] || die 'clone must be running for validation'
 
 known_hosts=$(mktemp)
