@@ -65,7 +65,15 @@ grep -q 'SOURCE_EVIDENCE_FILE' proxmox/template.defaults.env.example proxmox/clo
 grep -q 'cloud-init status --wait --long' scripts/validate-clone.sh
 grep -q "status: done" scripts/validate-clone.sh
 grep -q 'runuser -u "\$HERMES_USER"' scripts/validate-clone.sh
-grep -q 'hermes-vault search.*validation' scripts/validate-clone.sh
+python3 - <<'PY'
+import re
+from pathlib import Path
+
+source = Path('scripts/validate-clone.sh').read_text(encoding='utf-8')
+assert re.search(r'\bhermes_vault\s*=.*hermes-vault', source)
+assert re.search(r'"\$hermes_vault"\s+search\s+[\'\"]validation\.', source)
+assert 'validation memory remains in clone' in source
+PY
 grep -q 'MACHINE_ID_UNIQUE=PASS' proxmox/validate-clone.sh
 grep -q 'CLONE_VALIDATION=PASS' scripts/validate-clone.sh proxmox/validate-clone.sh
 grep -q 'rm -f -- "\$home/.hermes/.env"' scripts/sanitize-template.sh
